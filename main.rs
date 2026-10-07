@@ -30,16 +30,26 @@ fn main() {
         nb_holding_registers = 5;
     }
 
-    for mut _repetion in 0..20 {
+    let mut coil_client = client.read_coils(0, nb_coils).unwrap();
+    let mut holding_client = client
+        .read_holding_registers(0, nb_holding_registers)
+        .unwrap();
+
+    for mut _repetion in 0..200 {
         //Surveillance de l'équipement
-        let coil_client = client.read_coils(0, nb_coils).unwrap();
-        let coil_arrray = coil_formatting(coil_client);
-        let holding_client = client
+        let coil_client_temp = client.read_coils(0, nb_coils).unwrap();
+        let holding_client_temp = client
             .read_holding_registers(0, nb_holding_registers)
             .unwrap();
-        println!("{:?}{:?}", coil_arrray, holding_client);
+        if coil_client != coil_client_temp
+            || holding_client != holding_client_temp
+        {
+            coil_client = coil_client_temp;
+            let coil_array = coil_formatting(coil_client.clone());
+            holding_client = holding_client_temp;
+            println!("{:?}{:?}", coil_array, holding_client);
+        };
         sleep(Duration::new(0, 100000000));
-        _repetion += 1;
     }
 }
 
