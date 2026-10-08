@@ -4,7 +4,6 @@ use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 use std::vec::Vec;
-// Test
 
 fn main() {
     let db = rusqlite::Connection::open("plc.db").unwrap();                      // Création de la base de données
@@ -80,4 +79,33 @@ fn coil_formatting(coil_array : Vec<Coil>) -> String {
         }
     }
     return result;
+}
+
+fn store_coil_events(
+    db: &rusqlite::Connection,
+    utc_ms: u64,
+    prev_values: &[modbus::Coil],
+    new_values: &[modbus::Coil],
+) {
+    let mut a = prev_values
+    let mut b = new_values
+    for (ref_to_a, ref_to_b) in prev_values.iter_mut().zip(new_values.iter) {
+        
+        if a != b {
+            db.execute(
+                "INSERT INTO acquisition (utc_ms, adresse, etat)
+                VALUES (?1, ?2, ?3)",
+                (utc_ms as i64, plc_addr, state),)
+                .unwrap();
+        }
+    }
+}
+
+fn store_holding_events(
+    db: &rusqlite::Connection,
+    utc_ms: u64,
+    prev_values: &[u16],
+    new_values: &[u16],
+) {
+    // ...
 }
