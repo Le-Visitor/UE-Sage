@@ -4,6 +4,7 @@ use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 use std::vec::Vec;
+// Test
 
 fn main() {
     let db = rusqlite::Connection::open("plc.db").unwrap();                      // Création de la base de données
