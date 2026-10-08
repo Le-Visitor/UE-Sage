@@ -4,6 +4,7 @@ use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 use std::vec::Vec;
+// Test
 
 fn main() {
     let mut adress: String = "127.0.0.1".to_string(); // Affectation par défaut, typage forcé pour rendre mutable
