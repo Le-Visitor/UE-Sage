@@ -35,7 +35,9 @@ fn main() {
         .read_holding_registers(0, nb_holding_registers)
         .unwrap();
 
-    for mut _repetion in 0..200 {
+    let time_server = 100; //time for changing state of server en ms
+    let time_repetion = 20; //temps voulue de la boucle en s
+    for mut _repetion in 0..((time_repetion * 1000) / time_server) {
         //Surveillance de l'équipement
         let coil_client_temp = client.read_coils(0, nb_coils).unwrap();
         let holding_client_temp = client
@@ -49,7 +51,7 @@ fn main() {
             holding_client = holding_client_temp;
             println!("{:?}{:?}", coil_array, holding_client);
         };
-        sleep(Duration::new(0, 100000000));
+        sleep(Duration::new(0, time_server * 1000000));
     }
 }
 
