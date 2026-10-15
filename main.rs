@@ -87,11 +87,11 @@ fn store_coil_events(
     prev_values: &[modbus::Coil],
     new_values: &[modbus::Coil],
 ) {
-    let mut a = prev_values
-    let mut b = new_values
-    for (ref_to_a, ref_to_b) in prev_values.iter_mut().zip(new_values.iter) {
-        
+    let a = prev_values
+    let b = new_values
+    for (ref_to_a, ref_to_b, i) in prev_values.iter_mut().zip(new_values.iter).enumerate() {
         if a != b {
+            let plc_addr = format!("%M{}",i)
             db.execute(
                 "INSERT INTO acquisition (utc_ms, adresse, etat)
                 VALUES (?1, ?2, ?3)",
@@ -107,5 +107,16 @@ fn store_holding_events(
     prev_values: &[u16],
     new_values: &[u16],
 ) {
-    // ...
+    let c = prev_values
+    let d = new_values
+    for (ref_to_c, ref_to_d, i) in prev_values.iter_mut().zip(new_values.iter).enumerate() {
+        if c != d {
+            let plc_addr = format!("%MW{}",i)
+            db.execute(
+                "INSERT INTO acquisition (utc_ms, adresse, etat)
+                VALUES (?1, ?2, ?3)",
+                (utc_ms as i64, plc_addr, state),)
+                .unwrap();
+        }
+    }
 }
