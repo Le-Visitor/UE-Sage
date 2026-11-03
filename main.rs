@@ -1,8 +1,7 @@
-use modbus::tcp;
-use modbus::{Client, Coil};
+use modbus::{tcp, Client, Coil};
 use std::str::FromStr;
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use std::vec::Vec;
 
 fn main() {
@@ -60,11 +59,13 @@ fn main() {
         if coil_client != coil_client_temp
             || holding_client != holding_client_temp
         {
+            let coil_array_old = coil_formatting(coil_client.clone());
+            let coil_array_new = coil_formatting(coil_client_temp.clone());
+            store_coil_event(db, SystemTime::now(), coil_array_old, coil_array_new);
+            store_holding_event(db, SystemTime::now(), holding_client, holding_client_temp);
             coil_client = coil_client_temp;
-            let coil_array = coil_formatting(coil_client.clone());
             holding_client = holding_client_temp;
-            println!("{:?}{:?}", coil_array, holding_client);
-        };
+        }
         sleep(Duration::new(0, time_server * 1000000));
     }
 }
@@ -84,12 +85,10 @@ fn coil_formatting(coil_array : Vec<Coil>) -> String {
 fn store_coil_events(
     db: &rusqlite::Connection,
     utc_ms: u64,
-    prev_values: &[modbus::Coil],
+    prev_values: &mut [modbus::Coil],
     new_values: &[modbus::Coil],
 ) {
-    let a = prev_values;
-    let b = new_values;
-    let state= modbus::Coil::On;
+    let state= modbus::Coil::On as u8;
     for (i, (ref_to_a, ref_to_b)) in prev_values.iter_mut().zip(new_values.iter()).enumerate() {
         if ref_to_a != ref_to_b {
             let plc_addr = format!("%M{}",i);
@@ -105,11 +104,9 @@ fn store_coil_events(
 fn store_holding_events(
     db: &rusqlite::Connection,
     utc_ms: u64,
-    prev_values: &[u16],
-    new_values: &[u16],
+    prev_values: &mut[u8],
+    new_values: &[u8],
 ) {
-    let c = prev_values;
-    let d = new_values;
     let state = new_values;
     for (i, (ref_to_c, ref_to_d)) in prev_values.iter_mut().zip(new_values.iter()).enumerate() {
         if ref_to_c != ref_to_d {
